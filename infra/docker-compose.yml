@@ -1,0 +1,105 @@
+x-worker-template: &worker-base
+  image: ${DOCKER_REGISTRY-}shortymanagementworker
+  restart: always
+  build:
+    context: ../src/Shorty.Management
+    dockerfile: Shorty.Management.Worker/Dockerfile
+
+volumes:
+  caddy_data:
+  caddy_config:
+  sqlite_data:
+  nats_data:
+
+services:
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+  next-app:
+    restart: always
+    build:
+      context: ../src/Shorty.Frontend
+      dockerfile: Dockerfile
+    env_file:
+      - ../src/Shorty.Frontend/.env.local
+
+  nats-server:
+    image: nats:2.10-scratch
+    restart: always
+    ports:
+      - "8222:8222" 
+    command: [
+      "-p", "4222", #-p for messaging port
+      "-m", "8222", #-m for monitoring port
+      "-js", #-js for JetStream
+      "-sd", "/data/nats" #-sd /data tells it where to save
+    ]
+    volumes:
+      - nats_data:/data/nats
+
+  ef-migrator:
+    restart: "no"
+    image: ${DOCKER_REGISTRY-}shortymanagementapi
+    entrypoint: ./efbundle
+    volumes:
+      - sqlite_data:/data/sqlite
+
+  management-api:
+    image: ${DOCKER_REGISTRY-}shortymanagementapi
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    build:
+      context: ../src/Shorty.Management
+      dockerfile: Shorty.Management.Api/Dockerfile
+    volumes:
+      - sqlite_data:/data/sqlite
+    depends_on:
+      nats-server:
+        condition: service_started
+      ef-migrator:
+        condition: service_completed_successfully
+
+  engine-api: 
+    image: ${DOCKER_REGISTRY-}shortymanagementengine
+    restart: always
+    build:
+      context: ../src/Shorty.Engine
+      dockerfile: Dockerfile
+    volumes:
+      - sqlite_data:/data/sqlite
+    env_file:
+      - ../src/Shorty.Engine/.env
+
+  relay-worker: 
+    <<: *worker-base
+    environment: 
+      - WorkerMode=relay
+    volumes:
+      - sqlite_data:/data/sqlite
+    depends_on:
+      - nats-server
+
+  dispatch-worker:
+    <<: *worker-base
+    environment: 
+      - WorkerMode=dispatch
+    depends_on:
+      - nats-server
+
+  cleanup-worker:
+    <<: *worker-base
+    environment: 
+      - WorkerMode=cleanup
+    volumes:
+      - sqlite_data:/data/sqlite

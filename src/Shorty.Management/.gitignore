@@ -1,0 +1,41 @@
+# --- .NET Core / .NET 5+ Recursive Ignores ---
+**/[Bb]in/
+**/[Oo]bj/
+**/[Pp]ublish/
+
+# --- IDE & OS Specific (Recursive) ---
+**/.vs/
+**/.vscode/
+**/.ide/
+**/*.user
+**/*.userosscache
+**/*.suo
+**/.DS_Store
+Thumbs.db
+
+# --- Project Settings (Recursive) ---
+# Ignores local launch settings (ports/env vars) for all projects
+**/[Pp]roperties/launchSettings.json
+
+# --- Secrets & Config ---
+# NEVER commit these to GitHub
+**/[Aa]ppsettings.json
+**/[Aa]ppsettings.Production.json
+**/[Aa]ppsettings.Development.json
+**/[Aa]ppsettings.Local.json
+**/.env
+**/*.pfx
+**/*.publishsettings
+
+# --- Logs ---
+*.log
+**/logs/
+**/[Vv]log/
+
+# --- Package Manager ---
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets

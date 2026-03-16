@@ -1,0 +1,24 @@
+# --- Rust Recursive Ignores ---
+# Ignores all compiled artifacts and build folders
+**/target/
+
+# --- Cargo Specific ---
+# Contains your local registry and crates (usually not needed in repo)
+**/*.rs.bk
+**/cargo-bench.timestamp
+
+# --- IDE & OS Specific ---
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/*.user
+Thumbs.db
+
+# --- Logs & Temp ---
+*.log
+**/tmp/
+
+# --- Development Config ---
+# For environment variables
+**/.env
+**/.env.local

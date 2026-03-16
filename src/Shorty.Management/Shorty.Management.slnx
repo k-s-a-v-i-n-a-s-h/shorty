@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Shorty.Management.Api/Shorty.Management.Api.csproj" />
+  <Project Path="Shorty.Management.Domain/Shorty.Management.Domain.csproj" Id="b4f78486-b9c2-4634-babb-291a42532bed" />
+  <Project Path="Shorty.Management.Infrastructure/Shorty.Management.Infrastructure.csproj" Id="5027cb4a-7eae-4ad3-a723-e86ecc899bd2" />
+  <Project Path="Shorty.Management.Worker/Shorty.Management.Worker.csproj" Id="1170d3f8-c0d1-422a-97f7-4e885ce0b0c8" />
+</Solution>

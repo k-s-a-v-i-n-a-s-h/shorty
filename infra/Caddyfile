@@ -1,0 +1,4 @@
+{$DOMAIN:localhost} {
+    reverse_proxy next-app:8000
+    encode gzip
+}
